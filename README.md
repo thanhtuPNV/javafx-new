@@ -5,6 +5,7 @@
 # Entity Relationship Model <br/>
 ![painting](https://user-images.githubusercontent.com/96342336/173489388-e3167425-c18c-4e6a-b68a-ab8d5fb54c56.PNG)
 # Video <br/>
+https://drive.google.com/drive/folders/1d79NVL1LhoS1k-l2czhoMqHvKpFRHZBQ?usp=sharing
 # Các chức năng đã làm được <br/>
 Kết nối database, thêm, sửa, xóa, hiển thị
 # Chức năng em đang làm <br/>

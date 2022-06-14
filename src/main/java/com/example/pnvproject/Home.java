@@ -44,7 +44,7 @@ public class Home extends Application {
             imageView.setFitWidth(200);
             imageView.setFitHeight(200);
             Text textName = new Text(paintingList.get(i).getName());
-            textName.setStyle("-fx-font: normal bold 20px 'serif'");
+            textName.setStyle("-fx-font: normal bold 15px 'serif'");
 
             grid.add(imageView, 0, i+0);
             grid.add((textName), 1, i+0);
@@ -52,7 +52,7 @@ public class Home extends Application {
             grid.add((btnBuy), 3, i+0);
         }
 
-        scene = new Scene(grid, 500, 1000);
+        scene = new Scene(grid, 800, 1000);
         stage.setTitle("Painting");
         stage.setScene(scene);
         stage.show();

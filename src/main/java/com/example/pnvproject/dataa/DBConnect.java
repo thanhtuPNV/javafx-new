@@ -4,7 +4,6 @@ import com.example.pnvproject.models.Painting;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class DBConnect {
     private Connection connection;

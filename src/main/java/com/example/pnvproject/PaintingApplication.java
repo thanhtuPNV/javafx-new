@@ -8,35 +8,128 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.stage.StageStyle;
-import java.sql.*;
 
 public class PaintingApplication extends Application {
 
     private Scene scene;
+    private Scene navigationButton, admin, homePage;
+    public TextField name, pass;
+    private Stage window;
+    private static final DBConnect DB = new DBConnect();
     private static final String EMPTY = "";
+
     public static void main(String[] args) {
         launch(args);
     }
 
-    @Override
-    public void start(Stage stage) {
+    Scene navigationButton() {
+        GridPane goAdmin = new GridPane();
+        GridPane goHome = new GridPane();
+        GridPane goHomeAdmin = new GridPane();
+        goHomeAdmin.setAlignment(Pos.CENTER);
+        Button btnGoAdmin = new Button("GO ADMIN");
+        btnGoAdmin.setPadding(new Insets(15, 25, 15, 25));
+        btnGoAdmin.setOnAction(actionEvent -> {
+            window.setScene(admin);
+            window.centerOnScreen();
+        });
+        Button btnGoHome = new Button("GO Home");
+        btnGoHome.setPadding(new Insets(15, 25, 15, 25));
+        btnGoHome.setOnAction(actionEvent -> {
+            window.setScene(homePage);
+            window.centerOnScreen();
+        });
+        GridPane gridAdmin = new GridPane();
+        gridAdmin.getChildren().addAll(btnGoAdmin);
+
+        GridPane btnHome = new GridPane();
+        btnHome.getChildren().add(btnGoHome);
+
+        goAdmin.add(gridAdmin, 0, 0);
+
+        goHome.add(btnHome, 1, 0);
+
+        goHomeAdmin.add( goHome,0,0);
+        goHomeAdmin.add( goAdmin,1,0);
+
+        return new Scene(goHomeAdmin, 300, 300);
+    }
+
+    Scene home() {
+        Button btnGoBack = new Button("Back");
+        btnGoBack.setPadding(new Insets(5, 15, 5, 15));
+        btnGoBack.setOnAction(actionEvent -> {
+            window.setScene(navigationButton);
+            window.centerOnScreen();
+        });
+        //
+        GridPane home = new GridPane();
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
+        GridPane goBack = new GridPane();
+        //
+        GridPane btnBack = new GridPane();
+        btnBack.getChildren().addAll(btnGoBack);
+
+        goBack.add(btnBack, 2, 0);
+
+        home.add( goBack,2,0);
+        //
+        grid.setAlignment(Pos.TOP_CENTER);
         grid.setVgap(10);
         grid.setHgap(10);
         DBConnect DB = new DBConnect();
         ArrayList<Painting> paintingList = DB.getPaintings();
-//        DB.insertStudent(new Student("hue",9));
-//        DB.updateStudent(new Student(1,"tu",10));
-//        DB.deleteStudent(1);
-//        DB.getStudents();
+
+        //show
+        for(int i = 0; i < paintingList.size(); i++){
+
+            var btnBuy = new Button("Buy Now");
+            Image image = new Image(paintingList.get(i).getImage());
+            ImageView imageView = new ImageView();
+            imageView.setImage(image);
+            imageView.setFitWidth(200);
+            imageView.setFitHeight(200);
+            Text textName = new Text(paintingList.get(i).getName());
+            textName.setStyle("-fx-font: normal bold 15px 'serif'");
+
+            grid.add(imageView, 0, i+0);
+            grid.add((textName), 1, i+0);
+            grid.add(new Label ("Price: $"+String.valueOf(paintingList.get(i).getPrice())), 2, i+0);
+            grid.add((btnBuy), 3, i+0);
+        }
+        home.getChildren().add(grid);
+        return new Scene(home, 810, 800);
+    }
+
+    Scene admin() {
+        GridPane goBack = new GridPane();
+        Button btnGoBack = new Button("Back");
+        btnGoBack.setPadding(new Insets(5, 15, 5, 15));
+        btnGoBack.setOnAction(actionEvent -> {
+            window.setScene(navigationButton);
+            window.centerOnScreen();
+        });
+        //
+        GridPane adminn = new GridPane();
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setVgap(10);
+        grid.setHgap(10);
+        ArrayList<Painting> paintingList = DB.getPaintings();
+        //
+        //
+        GridPane btnAdmin = new GridPane();
+        btnAdmin.getChildren().addAll(btnGoBack);
+
+        goBack.add(btnAdmin, 0, 0);
+
+        adminn.add( goBack,1,0);
+        //
 
         grid.add(new Label("Name:"), 0, 0);
         var tfName = new TextField();
@@ -50,7 +143,7 @@ public class PaintingApplication extends Application {
         var tfPrice = new TextField();
         grid.add(tfPrice, 2, 1);
         //
-        grid.add(new Label("Description:"),3,  0);
+        grid.add(new Label("Description:"), 3, 0);
         var tfDescription = new TextField();
         grid.add(tfDescription, 3, 1);
         //
@@ -66,7 +159,9 @@ public class PaintingApplication extends Application {
             if (!name.equals(EMPTY) && !image.equals(EMPTY) && !price.equals(EMPTY) && !description.equals(EMPTY)) {
                 DB.insertPainting(new Painting(name, image, price, description));
                 try {
-                    start(stage);
+                    admin = admin();
+                    window.setScene(admin);
+                    window.centerOnScreen();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -80,7 +175,7 @@ public class PaintingApplication extends Application {
         grid.add(btnAdd, 4, 1);
 
         //show
-        for(int i = 0; i < paintingList.size(); i++){
+        for (int i = 0; i < paintingList.size(); i++) {
 
             Image image = new Image(paintingList.get(i).getImage());
             ImageView imageView = new ImageView();
@@ -88,10 +183,10 @@ public class PaintingApplication extends Application {
             imageView.setFitWidth(110);
             imageView.setFitHeight(110);
 
-            grid.add(new Label (paintingList.get(i).getName()), 0, i+2);
-            grid.add(imageView, 1, i+2);
-            grid.add(new Label ("$"+String.valueOf(paintingList.get(i).getPrice())), 2, i+2);
-            grid.add(new Label (paintingList.get(i).getDescription()), 3, i+2);
+            grid.add(new Label(paintingList.get(i).getName()), 0, i + 2);
+            grid.add(imageView, 1, i + 2);
+            grid.add(new Label("$" + String.valueOf(paintingList.get(i).getPrice())), 2, i + 2);
+            grid.add(new Label(paintingList.get(i).getDescription()), 3, i + 2);
 
             // Update
             var btnUpdate = new Button("Update");
@@ -119,13 +214,16 @@ public class PaintingApplication extends Application {
                     Integer Newprice = 0;
                     try {
                         Newprice = Integer.parseInt(tfprice.getText());
-                    }catch (Exception ex){}
+                    } catch (Exception ex) {
+                    }
 //                    Integer Newprice = Integer.valueOf(tfprice.getText());
                     String Newdescription = tfdescription.getText();
-                    if (!Newname.equals(EMPTY) && !Newimage.equals(EMPTY) && !(Newprice == 0) && !Newdescription.equals(EMPTY)) {
+                    if (!Newname.equals(EMPTY) && !Newimage.equals(EMPTY) && !(Newprice == 0)) {
                         DB.updatePainting(new Painting(Newid, Newname, Newimage, Newprice, Newdescription));
                         try {
-                            start(stage);
+                            admin = admin();
+                            window.setScene(admin);
+                            window.centerOnScreen();
                         } catch (Exception ex) {
                             throw new RuntimeException(ex);
                         }
@@ -138,7 +236,7 @@ public class PaintingApplication extends Application {
                 });
                 grid.add(newbtnAdd, 4, 1);
             });
-            grid.add(btnUpdate, 4, i+2);
+            grid.add(btnUpdate, 4, i + 2);
 
             // Delete
             var btnDelete = new Button("Delete");
@@ -151,17 +249,27 @@ public class PaintingApplication extends Application {
                 alert.setContentText("Deleted!");
                 alert.showAndWait();
                 try {
-                    start(stage);
+                    admin = admin();
+                    window.setScene(admin);
+                    window.centerOnScreen();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
             });
-            grid.add(btnDelete, 5, i+2);
+            grid.add(btnDelete, 5, i + 2);
         }
+        adminn.getChildren().add(grid);
+        return new Scene(adminn, 810, 800);
+    }
 
-        scene = new Scene(grid, 1500, 1000);
-        stage.setTitle("Painting");
-        stage.setScene(scene);
-        stage.show();
+
+    @Override
+    public void start(Stage stage) {
+        admin = this.admin();
+        homePage = this.home();
+        navigationButton = this.navigationButton();
+        window = stage;
+        window.setScene(navigationButton);
+        window.show();
     }
 }
